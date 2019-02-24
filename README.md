@@ -8,7 +8,7 @@ Live (generated) code is available in `master` branch.
 
 ## Run server locally
 ```
-middleman build
+middleman server
 ```
 
 ## Build static files
