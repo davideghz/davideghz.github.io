@@ -1,0 +1,13 @@
+= wrap_layout :layout do
+  .Posts
+    %article.Posts__post
+      %time.Posts__postDate
+        - if is_blog_article?
+          = current_article.date.strftime('%Y %b %d')
+
+      %header.Posts__postTitle
+        - if is_blog_article?
+          = current_article.title
+
+      .Posts__postContent
+        = yield

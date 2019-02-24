@@ -1,0 +1,36 @@
+---
+pageable: true
+---
+
+.Posts
+  - page_articles.each_with_index do |article, i|
+    %article.Posts__post
+      %time.Posts__postDate
+        -if article
+          = article.date.strftime('%Y %b %d')
+
+      %header.Posts__postTitle
+        = link_to article.title, article
+
+      -#%p.Posts__postExcerpt
+      -#  = article.summary(50, ' ...')
+
+      .Posts__postTags
+        - article.tags.each do |tag|
+          = link_to tag, tag_path(tag), class: 'Posts__postTag'
+
+  .Pagination
+    - if paginate && num_pages > 1
+      - if prev_page
+        = link_to prev_page do
+          %i(class="fa fa-arrow-left")
+
+      %span
+        Page
+        = page_number
+        of
+        = num_pages
+
+      - if next_page
+        = link_to next_page do
+          %i(class="fa fa-arrow-right")
