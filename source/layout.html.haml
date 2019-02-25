@@ -10,6 +10,7 @@
 
     %link{ rel: "stylesheet", href: "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" }
 
+    = favicon_tag 'favicon.ico'
     = stylesheet_link_tag 'custom'
     = javascript_include_tag 'custom'
     = feed_tag :atom, "#{blog.options.prefix.to_s}/feed.xml", title: "Atom Feed"
