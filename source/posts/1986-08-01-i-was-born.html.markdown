@@ -1,0 +1,11 @@
+---
+title: I was born
+date: 1986-08-01
+tags: me, life
+---
+
+It was a friday afternoon, I born ready for the weekend.
+
+```ruby
+me = Person.new(first_name: 'Davide', last_name: 'Ghezzi')
+```
