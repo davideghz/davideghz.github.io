@@ -5,10 +5,131 @@
   <id>http://blog.url.com/posts</id>
   <link href="http://blog.url.com/posts"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2019-04-17T02:00:00+02:00</updated>
+  <updated>2019-04-24T02:00:00+02:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Install Python the right way</title>
+    <link rel="alternate" href="http://blog.url.com/posts/install-python-the-right-way/"/>
+    <id>http://blog.url.com/posts/install-python-the-right-way/</id>
+    <published>2019-04-24T02:00:00+02:00</published>
+    <updated>2019-04-24T15:19:04+02:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Does this sound familiar?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src="https://imgs.xkcd.com/comics/python_environment_2x.png" alt="Messy Python" /&gt;&lt;/p&gt;
+
+&lt;p&gt;Installing Python for me has always been a pain. There are way too many &amp;ldquo;suggested&amp;rdquo; way to install it, too many strategies to handle different versions and projects&amp;rsquo; dependencies&amp;hellip; virtualenv, pip, pip3, pyenv, pipenv, brew. It&amp;rsquo;s a mess. And if you want your favorite IDE to automatically play along with your installations, well, things get more and more confused.&lt;/p&gt;
+
+&lt;p&gt;Until today!&lt;/p&gt;
+
+&lt;p&gt;I spent a night and a morning fooling around with python versions and virtual encironments, until I arrived to the perfect working solution. It&amp;rsquo;s actually a cocktail of well balanced and tasty ingredients:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;pyenv: to efficiently install and handle different versions of Python&lt;/li&gt;
+&lt;li&gt;pipenv: to isolate projects&amp;rsquo; dependencies&lt;/li&gt;
+&lt;li&gt;PyCharm: the definitive IDE for python developers, it will fit perfectly this setup&lt;/li&gt;
+&lt;li&gt;some smart tweaks to your &lt;code&gt;~/.profile&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;disclaimer: the following setup works on my macbook pro with macOS Mojave 10.14.4 - it has not been tested on different systems or different varsions of the same system.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1&gt;pyenv&lt;/h1&gt;
+
+&lt;p&gt;First things first: install your next favorite toy&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;&lt;span style="color: #008080"&gt;$ &lt;/span&gt;brew install pyenv
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Then add &lt;code&gt;pyenv init&lt;/code&gt; to your shell to enable shims and autocompletion&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;&lt;span style="color: #008080"&gt;$ &lt;/span&gt;&lt;span style="color: #0086B3"&gt;echo&lt;/span&gt; &lt;span style="color: #000080"&gt;-e&lt;/span&gt; &lt;span style="color: #d14"&gt;'if command -v pyenv 1&amp;gt;/dev/null 2&amp;gt;&amp;amp;1; then\n  eval "$(pyenv init -)"\nfi'&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;&amp;gt;&amp;gt;&lt;/span&gt; ~/.profile
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;That&amp;rsquo;s it. You can now install different Pythons compiling them directly from source&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;&lt;span style="color: #008080"&gt;$ &lt;/span&gt;pyenv install 2.7.8
+&lt;span style="color: #008080"&gt;$ &lt;/span&gt;pyenv install 3.6.8
+&lt;span style="color: #008080"&gt;$ &lt;/span&gt;pyenv versions
+  system
+  2.7.8
+&lt;span style="color: #000000;font-weight: bold"&gt;*&lt;/span&gt; 3.6.8 &lt;span style="color: #000000;font-weight: bold"&gt;(&lt;/span&gt;&lt;span style="color: #0086B3"&gt;set &lt;/span&gt;by /Users/davide/.pyenv/version&lt;span style="color: #000000;font-weight: bold"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now you&amp;rsquo;ll be able to setup a global version or specific version for specific folders&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;pyenv global 3.6.8
+pyenv &lt;span style="color: #0086B3"&gt;local &lt;/span&gt;2.7.6
+&lt;span style="color: #999988;font-style: italic"&gt;# the last cmd creates a .python-version file in the current directory.&lt;/span&gt;
+&lt;span style="color: #999988;font-style: italic"&gt;# The local version overrides the global one.&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;At &lt;a href="https://github.com/pyenv/pyenv/blob/master/COMMANDS.md"&gt;this link&lt;/a&gt; you can find a comprehensive pyenv command reference.&lt;/p&gt;
+
+&lt;h1&gt;pipenv&lt;/h1&gt;
+
+&lt;p&gt;The official guides instructs to install pipenv through HomeBrew: &lt;code&gt;brew install pipenv&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;What worked for me was instead the old fashioned &lt;code&gt;sudo -H pip install -U pipenv&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;I won&amp;rsquo;t list pipenv commands and description, you can find them &lt;a href="https://github.com/pypa/pipenv"&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1&gt;PyCharm&lt;/h1&gt;
+
+&lt;p&gt;PyCharm will automatically try to install the dependencies listed in the Pipfile; but almost surely it will fail.&lt;/p&gt;
+
+&lt;p&gt;Here below some tweaks to make the magic happen:&lt;/p&gt;
+
+&lt;p&gt;First of all add the following to your &lt;code&gt;~/.profile&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;&lt;span style="color: #999988;font-style: italic"&gt;# Run the following command to find the user base's binary directory:&lt;/span&gt;
+&lt;span style="color: #008080"&gt;$ &lt;/span&gt;python &lt;span style="color: #000080"&gt;-m&lt;/span&gt; site &lt;span style="color: #000080"&gt;--user-base&lt;/span&gt;
+
+&lt;span style="color: #999988;font-style: italic"&gt;# A sample output can be&lt;/span&gt;
+/Users/davide/.local
+
+&lt;span style="color: #999988;font-style: italic"&gt;# Add bin to this path to receive a string for adding to the ~/.profile file, for example:&lt;/span&gt;
+&lt;span style="color: #008080"&gt;$ &lt;/span&gt;&lt;span style="color: #0086B3"&gt;export &lt;/span&gt;&lt;span style="color: #008080"&gt;PATH&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$PATH&lt;/span&gt;&lt;span style="color: #d14"&gt;:Users/jetbrains/.local/bin"&lt;/span&gt;
+&lt;span style="color: #008080"&gt;$ &lt;/span&gt;&lt;span style="color: #0086B3"&gt;source&lt;/span&gt; ~/.profile
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now you can get back to PyCharm:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;look for &lt;strong&gt;Project Interpreter&lt;/strong&gt; in the &lt;strong&gt;Preferences&lt;/strong&gt; Panel.&lt;/li&gt;
+&lt;li&gt;click on the small gear icon on the right / click on ADD&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Now here there is a small gotcha that made me crazy spending a ton of time, so pay attention:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;I jknow you want to setup a &lt;strong&gt;Pipenv Environment&lt;/strong&gt;, but STFU, trust me and click on &lt;strong&gt;Virtualenv Environment&lt;/strong&gt; on the left menu.&lt;/li&gt;
+&lt;li&gt;Check &lt;strong&gt;Existing Enviroment&lt;/strong&gt; and select the correct pyenv&amp;rsquo;s python installation / click ok&lt;/li&gt;
+&lt;li&gt;Now click again on the small gear icon, and this time click on &lt;strong&gt;Pipenv Environment&lt;/strong&gt; on the left menu&lt;/li&gt;
+&lt;li&gt;The base interpreter will be available; select it! (at current time, if you don&amp;rsquo;t follow what I wrote here above you won&amp;rsquo;t find it)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;PyCharm will create the environment using the global (or local) python version set with pyenv.&lt;/p&gt;
+
+&lt;p&gt;Happy coding!&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>EBS extensions, from WTF?! to OMGILUVIT&lt;3</title>
     <link rel="alternate" href="http://blog.url.com/posts/ebs-extension/"/>
