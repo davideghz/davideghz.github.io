@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Blog Name</title>
+  <subtitle>Blog subtitle</subtitle>
+  <id>http://blog.url.com/posts</id>
+  <link href="http://blog.url.com/posts"/>
+  <link href="http://blog.url.com/feed.xml" rel="self"/>
+  <updated>2019-04-17T02:00:00+02:00</updated>
+  <author>
+    <name>Blog Author</name>
+  </author>
+  <entry>
+    <title>EBS extensions, from WTF?! to OMGILUVIT&lt;3</title>
+    <link rel="alternate" href="http://blog.url.com/posts/ebs-extension/"/>
+    <id>http://blog.url.com/posts/ebs-extension/</id>
+    <published>2019-04-17T02:00:00+02:00</published>
+    <updated>2019-04-24T10:32:51+02:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;AWS ElasticBeanstalk is an awesome tool to automate deploy operations.&lt;/p&gt;
+
+&lt;p&gt;Install the cli, checkout the code, and &lt;code&gt;eb deploy&lt;/code&gt; will do the rest; it will setup a nice looking stack including cool stuff like load balancing, auto scaling, containerized virtual instances for your application and DB, security groups, health monitors, notifications, etc…&lt;/p&gt;
+
+&lt;p&gt;Easy? YES. Until you need to tune the underlying deploy pipeline or resources. Let’s say you need a different node version to run in your env because one of your app’s dependencies decided it no longer likes node 6.4, which is currently the default on the &lt;code&gt;Puma with Ruby 2.6 running on 64bit Amazon Linux/2.9.2&lt;/code&gt; MRI; You’ll be in big trouble.&lt;/p&gt;
+
+&lt;p&gt;I spent many hours last night on this, and I feel like sharing my experience might save other people’s precious sleeping hours.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;You can add AWS Elastic Beanstalk configuration files (.ebextensions) to your web application’s source code to configure your environment and customize the AWS resources that it contains. Configuration files are YAML- or JSON-formatted documents with a .config file extension that you place in a folder named .ebextensions and deploy in your application source bundle.&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;AWS EBS docs&lt;/cite&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Note that .ebextensions files are executed in alphabetical order. I was not able to find a complete list of such files, but errors from &lt;code&gt;eb deploy&lt;/code&gt; command contained the files’ name containing the failing commands, so I was able to name them coherently.&lt;/p&gt;
+
+&lt;p&gt;To update or install a specific Node version in an EBS environment, just create a file and put in a &lt;code&gt;.ebextensions&lt;/code&gt; folder in your root.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;e.g, my-app/.ebextensions/app.config&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;files:
+  &lt;span style="color: #d14"&gt;"/opt/elasticbeanstalk/hooks/appdeploy/pre/10_nodejs.sh"&lt;/span&gt;:
+    mode: &lt;span style="color: #d14"&gt;"000777"&lt;/span&gt;
+    owner: &lt;span style="color: #d14"&gt;'root'&lt;/span&gt;
+    group: &lt;span style="color: #d14"&gt;'root'&lt;/span&gt;
+    content: |
+        &lt;span style="color: #999988;font-style: italic"&gt;#!/usr/bin/env bash&lt;/span&gt;
+
+        &lt;span style="color: #0086B3"&gt;.&lt;/span&gt; /opt/elasticbeanstalk/hooks/common.sh
+
+        &lt;span style="color: #0086B3"&gt;set&lt;/span&gt; &lt;span style="color: #000080"&gt;-xe&lt;/span&gt;
+        &lt;span style="color: #008080"&gt;EB_NODE_VERSION&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;&lt;span style="color: #d14"&gt;"v8.9.4"&lt;/span&gt;
+
+        &lt;span style="color: #008080"&gt;file&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;&lt;span style="color: #d14"&gt;"/etc/elasticbeanstalk/baking_manifest/node_installed_&lt;/span&gt;&lt;span style="color: #008080"&gt;$EB_NODE_VERSION&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt;
+        &lt;span style="color: #000000;font-weight: bold"&gt;if&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;[&lt;/span&gt; &lt;span style="color: #000080"&gt;-e&lt;/span&gt; &lt;span style="color: #008080"&gt;$file&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;]&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;then
+            &lt;/span&gt;&lt;span style="color: #0086B3"&gt;echo &lt;/span&gt;Node.js has already been installed. Skipping installation.
+        &lt;span style="color: #000000;font-weight: bold"&gt;else
+            &lt;/span&gt;&lt;span style="color: #008080"&gt;EB_TARBALL_URL&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;$(&lt;/span&gt;/opt/elasticbeanstalk/bin/get-config container &lt;span style="color: #000080"&gt;-k&lt;/span&gt; tarball_url&lt;span style="color: #000000;font-weight: bold"&gt;)&lt;/span&gt;
+            &lt;span style="color: #008080"&gt;EB_NODE_INSTALL_DIR&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;$(&lt;/span&gt;/opt/elasticbeanstalk/bin/get-config container &lt;span style="color: #000080"&gt;-k&lt;/span&gt; node_install_dir&lt;span style="color: #000000;font-weight: bold"&gt;)&lt;/span&gt;
+
+            &lt;span style="color: #008080"&gt;MACHINE_TYPE&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;&lt;span style="color: #d14"&gt;`&lt;/span&gt;uname &lt;span style="color: #000080"&gt;-m&lt;/span&gt;&lt;span style="color: #d14"&gt;`&lt;/span&gt;
+            &lt;span style="color: #000000;font-weight: bold"&gt;if&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;[&lt;/span&gt; &lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$MACHINE_TYPE&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"x86_64"&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;]&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;then
+                &lt;/span&gt;&lt;span style="color: #008080"&gt;ARCH&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;x64
+            &lt;span style="color: #000000;font-weight: bold"&gt;elif&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;[&lt;/span&gt; &lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$MACHINE_TYPE&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"i686"&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;]&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;then
+                &lt;/span&gt;&lt;span style="color: #008080"&gt;ARCH&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;x86
+            &lt;span style="color: #000000;font-weight: bold"&gt;else
+                &lt;/span&gt;&lt;span style="color: #0086B3"&gt;echo&lt;/span&gt; &lt;span style="color: #d14"&gt;"Unknown architecture."&lt;/span&gt;
+                &lt;span style="color: #0086B3"&gt;exit &lt;/span&gt;1
+            &lt;span style="color: #000000;font-weight: bold"&gt;fi
+
+            &lt;/span&gt;mkdir &lt;span style="color: #000080"&gt;-p&lt;/span&gt; &lt;span style="color: #008080"&gt;$EB_NODE_INSTALL_DIR&lt;/span&gt;
+            curl &lt;span style="color: #000080"&gt;-L&lt;/span&gt; https://nodejs.org/dist/&lt;span style="color: #008080"&gt;$EB_NODE_VERSION&lt;/span&gt;/node-&lt;span style="color: #008080"&gt;$EB_NODE_VERSION&lt;/span&gt;&lt;span style="color: #000080"&gt;-linux-&lt;/span&gt;&lt;span style="color: #008080"&gt;$ARCH&lt;/span&gt;.tar.gz | &lt;span style="color: #0086B3"&gt;tar &lt;/span&gt;zxf - &lt;span style="color: #000080"&gt;-C&lt;/span&gt; &lt;span style="color: #008080"&gt;$EB_NODE_INSTALL_DIR&lt;/span&gt;
+            ln &lt;span style="color: #000080"&gt;-sf&lt;/span&gt; &lt;span style="color: #008080"&gt;$EB_NODE_INSTALL_DIR&lt;/span&gt;/node-&lt;span style="color: #008080"&gt;$EB_NODE_VERSION&lt;/span&gt;&lt;span style="color: #000080"&gt;-linux-&lt;/span&gt;&lt;span style="color: #008080"&gt;$ARCH&lt;/span&gt;/bin/node /usr/bin/
+            ln &lt;span style="color: #000080"&gt;-sf&lt;/span&gt; &lt;span style="color: #008080"&gt;$EB_NODE_INSTALL_DIR&lt;/span&gt;/node-&lt;span style="color: #008080"&gt;$EB_NODE_VERSION&lt;/span&gt;&lt;span style="color: #000080"&gt;-linux-&lt;/span&gt;&lt;span style="color: #008080"&gt;$ARCH&lt;/span&gt;/bin/node-waf /usr/bin/
+            ln &lt;span style="color: #000080"&gt;-sf&lt;/span&gt; &lt;span style="color: #008080"&gt;$EB_NODE_INSTALL_DIR&lt;/span&gt;/node-&lt;span style="color: #008080"&gt;$EB_NODE_VERSION&lt;/span&gt;&lt;span style="color: #000080"&gt;-linux-&lt;/span&gt;&lt;span style="color: #008080"&gt;$ARCH&lt;/span&gt;/bin/npm /usr/bin/
+            &lt;span style="color: #0086B3"&gt;echo&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;$(&lt;/span&gt;date&lt;span style="color: #000000;font-weight: bold"&gt;)&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span style="color: #d14"&gt;"/etc/elasticbeanstalk/baking_manifest/node_installed_&lt;/span&gt;&lt;span style="color: #008080"&gt;$EB_NODE_VERSION&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt;
+
+            rm &lt;span style="color: #000080"&gt;-rf&lt;/span&gt; /home/webapp/.npm/
+            rm &lt;span style="color: #000080"&gt;-rf&lt;/span&gt; /var/app/ondeck/node_modules/
+            npm cache clean &lt;span style="color: #000080"&gt;--force&lt;/span&gt;
+            rm &lt;span style="color: #000080"&gt;-rf&lt;/span&gt; /opt/elasticbeanstalk/support/node-install/node-v6&lt;span style="color: #000000;font-weight: bold"&gt;*&lt;/span&gt;
+            rm &lt;span style="color: #000080"&gt;-rf&lt;/span&gt; /opt/elasticbeanstalk/support/node-install/node-v4&lt;span style="color: #000000;font-weight: bold"&gt;*&lt;/span&gt;
+        &lt;span style="color: #000000;font-weight: bold"&gt;fi
+
+        &lt;/span&gt;mkdir &lt;span style="color: #000080"&gt;-p&lt;/span&gt; /home/webapp
+        chown &lt;span style="color: #000080"&gt;-R&lt;/span&gt; webapp:webapp /home/webapp
+        mkdir &lt;span style="color: #000080"&gt;-p&lt;/span&gt; /var/app/support/.npm_global
+        npm config &lt;span style="color: #0086B3"&gt;set &lt;/span&gt;prefix /var/app/support/.npm_global
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Also the following note, straight from the docs, would have saved me a big headache, if I only would have read it before starting my journey down the ebextensions hole.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;TIP: When you are developing or testing new configuration files, launch a clean environment running the default application and deploy to that. Poorly formatted configuration files will cause a new environment launch to fail unrecoverably.&lt;/p&gt;
+
+&lt;p&gt;&lt;cite&gt;AWS EBS docs&lt;/cite&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The same way it is possible to update Bundler to v2 (in case you are trying to deploy a Ruby 2.6 and Rails 5 app to EBS and getting error with Bundler).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;files:
+  &lt;span style="color: #999988;font-style: italic"&gt;# Runs before `./10_bundle_install.sh`:&lt;/span&gt;
+  &lt;span style="color: #d14"&gt;"/opt/elasticbeanstalk/hooks/appdeploy/pre/09_gem_install_bundler.sh"&lt;/span&gt; :
+    mode: &lt;span style="color: #d14"&gt;"000775"&lt;/span&gt;
+    owner: root
+    group: users
+    content: |
+      &lt;span style="color: #999988;font-style: italic"&gt;#!/usr/bin/env bash&lt;/span&gt;
+
+      &lt;span style="color: #008080"&gt;EB_APP_STAGING_DIR&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;$(&lt;/span&gt;/opt/elasticbeanstalk/bin/get-config container &lt;span style="color: #000080"&gt;-k&lt;/span&gt; app_staging_dir&lt;span style="color: #000000;font-weight: bold"&gt;)&lt;/span&gt;
+      &lt;span style="color: #008080"&gt;EB_SCRIPT_DIR&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;$(&lt;/span&gt;/opt/elasticbeanstalk/bin/get-config container &lt;span style="color: #000080"&gt;-k&lt;/span&gt; script_dir&lt;span style="color: #000000;font-weight: bold"&gt;)&lt;/span&gt;
+      &lt;span style="color: #999988;font-style: italic"&gt;# Source the application's ruby, i.e. 2.6. Otherwise it will be 2.3, which will&lt;/span&gt;
+      &lt;span style="color: #999988;font-style: italic"&gt;# give this error: `bundler requires Ruby version &amp;gt;= 2.3.0`&lt;/span&gt;
+      &lt;span style="color: #0086B3"&gt;.&lt;/span&gt; &lt;span style="color: #008080"&gt;$EB_SCRIPT_DIR&lt;/span&gt;/use-app-ruby.sh
+
+      &lt;span style="color: #0086B3"&gt;cd&lt;/span&gt; &lt;span style="color: #008080"&gt;$EB_APP_STAGING_DIR&lt;/span&gt;
+      &lt;span style="color: #0086B3"&gt;echo&lt;/span&gt; &lt;span style="color: #d14"&gt;"Installing compatible bundler"&lt;/span&gt;
+      gem install bundler &lt;span style="color: #000080"&gt;-v&lt;/span&gt; 2.0.1
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content>
+  </entry>
+  <entry>
+    <title>I was born</title>
+    <link rel="alternate" href="http://blog.url.com/posts/i-was-born/"/>
+    <id>http://blog.url.com/posts/i-was-born/</id>
+    <published>1986-08-01T02:00:00+02:00</published>
+    <updated>2019-04-24T10:32:51+02:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;It was a friday afternoon, I born ready for the weekend.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;&lt;span style="background-color: #f8f8f8"&gt;me&lt;/span&gt; &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #008080"&gt;Person&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;.&lt;/span&gt;&lt;span style="color: #990000;font-weight: bold"&gt;new&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;(&lt;/span&gt;&lt;span style="color: #990073"&gt;first_name: &lt;/span&gt;&lt;span style="color: #d14"&gt;'Davide'&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;,&lt;/span&gt; &lt;span style="color: #990073"&gt;last_name: &lt;/span&gt;&lt;span style="color: #d14"&gt;'Ghezzi'&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content>
+  </entry>
+</feed>

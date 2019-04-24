@@ -1,0 +1,1 @@
+function myFunction(){var a=document.getElementById("nav-bar");"NavBar"===a.className?a.className+=" responsive":a.className="NavBar"}console.log("doh!");
