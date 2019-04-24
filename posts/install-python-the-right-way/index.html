@@ -41,7 +41,7 @@ Install Python the right way
 
 <p>Until today!</p>
 
-<p>I spent a night and a morning fooling around with python versions and virtual encironments, until I arrived to the perfect working solution. It&rsquo;s actually a cocktail of well balanced and tasty ingredients:</p>
+<p>I spent a night and a morning fooling around with python versions and virtual environments, until I arrived to the perfect working solution. It&rsquo;s actually a cocktail of well balanced and tasty ingredients:</p>
 
 <ul>
 <li>pyenv: to efficiently install and handle different versions of Python</li>
@@ -51,12 +51,12 @@ Install Python the right way
 </ul>
 
 <blockquote>
-<p>disclaimer: the following setup works on my macbook pro with macOS Mojave 10.14.4 - it has not been tested on different systems or different varsions of the same system.</p>
+<p>disclaimer: the following setup works on my macbook pro with macOS Mojave 10.14.4 - it has not been tested on different systems or different versions of the same system.</p>
 </blockquote>
 
 <h1>pyenv</h1>
 
-<p>First things first: install your next favorite toy</p>
+<p>First thing first: install your next favorite toy</p>
 <div class="highlight"><pre class="highlight shell"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span style="color: #008080">$ </span>brew install pyenv
 </pre></td></tr></tbody></table></code></pre></div>
@@ -78,7 +78,7 @@ Install Python the right way
   2.7.8
 <span style="color: #000000;font-weight: bold">*</span> 3.6.8 <span style="color: #000000;font-weight: bold">(</span><span style="color: #0086B3">set </span>by /Users/davide/.pyenv/version<span style="color: #000000;font-weight: bold">)</span>
 </pre></td></tr></tbody></table></code></pre></div>
-<p>Now you&rsquo;ll be able to setup a global version or specific version for specific folders</p>
+<p>Now you&rsquo;ll be able to setup a global version or a specific version to be used in specific folders</p>
 <div class="highlight"><pre class="highlight shell"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -134,7 +134,7 @@ pyenv <span style="color: #0086B3">local </span>2.7.6
 <p>Now here there is a small gotcha that made me crazy spending a ton of time, so pay attention:</p>
 
 <ul>
-<li>I jknow you want to setup a <strong>Pipenv Environment</strong>, but STFU, trust me and click on <strong>Virtualenv Environment</strong> on the left menu.</li>
+<li>I know you want to setup a <strong>Pipenv Environment</strong>, but STFU, trust me and click on <strong>Virtualenv Environment</strong> on the left menu.</li>
 <li>Check <strong>Existing Enviroment</strong> and select the correct pyenv&rsquo;s python installation / click ok</li>
 <li>Now click again on the small gear icon, and this time click on <strong>Pipenv Environment</strong> on the left menu</li>
 <li>The base interpreter will be available; select it! (at current time, if you don&rsquo;t follow what I wrote here above you won&rsquo;t find it)</li>
