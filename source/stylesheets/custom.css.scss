@@ -31,6 +31,23 @@ a {
   }
 }
 
+blockquote {
+  border-left: solid 3px blue;
+  margin: 0;
+  padding: 0 1em;
+
+  cite {
+    color: #999;
+  }
+}
+
+p > code {
+  background-color: #f1f1f1;
+  padding: 5px 5px;
+  font-size: 14px
+}
+
+
 /* HEADER
 --------------------------------------------------------------------- */
 /* Add a black background color to the top navigation */
@@ -185,8 +202,15 @@ clicks on the icon. This class makes the topnav look good on small screens
 
 /* CODE HIGHLIGHTS
 --------------------------------------------------------------------- */
+pre {
+  margin: 0;
+}
+code {
+  font-size: 14px
+}
 .highlight {
   overflow-x: scroll;
+  background-color: #f9f9f9;
 }
 .lineno {
   width: 25px;

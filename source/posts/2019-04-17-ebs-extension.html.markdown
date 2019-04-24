@@ -8,17 +8,17 @@ AWS ElasticBeanstalk is an awesome tool to automate deploy operations.
 
 Install the cli, checkout the code, and `eb deploy` will do the rest; it will setup a nice looking stack including cool stuff like load balancing, auto scaling, containerized virtual instances for your application and DB, security groups, health monitors, notifications, etc…
 
-Easy? YES. Until you need to tune the underlying deploy pipeline or resources. Let’s say you need a different node version to run in your env because one of your app’s dependencies decided it no longer likes node 6.4, which is currently the default on the `Puma with Ruby 2.6 running on 64bit Amazon Linux/2.9.2 MRI`; You’ll be in big trouble.
+Easy? YES. Until you need to tune the underlying deploy pipeline or resources. Let’s say you need a different node version to run in your env because one of your app’s dependencies decided it no longer likes node 6.4, which is currently the default on the `Puma with Ruby 2.6 running on 64bit Amazon Linux/2.9.2` MRI; You’ll be in big trouble.
 
 I spent many hours last night on this, and I feel like sharing my experience might save other people’s precious sleeping hours.
 
 >You can add AWS Elastic Beanstalk configuration files (.ebextensions) to your web application’s source code to configure your environment and customize the AWS resources that it contains. Configuration files are YAML- or JSON-formatted documents with a .config file extension that you place in a folder named .ebextensions and deploy in your application source bundle.
 
-> — AWS EBS docs
+> <cite>AWS EBS docs</cite>
 
 Note that .ebextensions files are executed in alphabetical order. I was not able to find a complete list of such files, but errors from `eb deploy` command contained the files’ name containing the failing commands, so I was able to name them coherently.
 
-To update or install a specific Node version in an EBS environment, just create a file and put in a .ebextensions folder in your root.
+To update or install a specific Node version in an EBS environment, just create a file and put in a `.ebextensions` folder in your root.
 
 **e.g, my-app/.ebextensions/app.config**
 
@@ -77,7 +77,7 @@ Also the following note, straight from the docs, would have saved me a big heada
 
 > TIP: When you are developing or testing new configuration files, launch a clean environment running the default application and deploy to that. Poorly formatted configuration files will cause a new environment launch to fail unrecoverably.
 
-> — AWS EBS docs
+> <cite>AWS EBS docs</cite>
 
 The same way it is possible to update Bundler to v2 (in case you are trying to deploy a Ruby 2.6 and Rails 5 app to EBS and getting error with Bundler).
 
