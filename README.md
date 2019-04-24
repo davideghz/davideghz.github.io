@@ -29,5 +29,7 @@ git push origin master --force
 ```
 cd build
 git checkout master
+git add .
+git commit -m 'build'
 git push origin master
 ```

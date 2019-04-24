@@ -12,18 +12,18 @@ Installing Python for me has always been a pain. There are way too many "suggest
 
 Until today!
 
-I spent a night and a morning fooling around with python versions and virtual encironments, until I arrived to the perfect working solution. It's actually a cocktail of well balanced and tasty ingredients:
+I spent a night and a morning fooling around with python versions and virtual environments, until I arrived to the perfect working solution. It's actually a cocktail of well balanced and tasty ingredients:
 
 - pyenv: to efficiently install and handle different versions of Python
 - pipenv: to isolate projects' dependencies
 - PyCharm: the definitive IDE for python developers, it will fit perfectly this setup
 - some smart tweaks to your `~/.profile`
 
-> disclaimer: the following setup works on my macbook pro with macOS Mojave 10.14.4 - it has not been tested on different systems or different varsions of the same system.
+> disclaimer: the following setup works on my macbook pro with macOS Mojave 10.14.4 - it has not been tested on different systems or different versions of the same system.
 
 # pyenv
 
-First things first: install your next favorite toy
+First thing first: install your next favorite toy
 
 ```bash
 $ brew install pyenv
@@ -46,7 +46,7 @@ $ pyenv versions
 * 3.6.8 (set by /Users/davide/.pyenv/version)
 ```
 
-Now you'll be able to setup a global version or specific version for specific folders
+Now you'll be able to setup a global version or a specific version to be used in specific folders
 
 ```bash
 pyenv global 3.6.8
@@ -92,7 +92,7 @@ Now you can get back to PyCharm:
 
 Now here there is a small gotcha that made me crazy spending a ton of time, so pay attention:
 
-- I jknow you want to setup a **Pipenv Environment**, but STFU, trust me and click on **Virtualenv Environment** on the left menu.
+- I know you want to setup a **Pipenv Environment**, but STFU, trust me and click on **Virtualenv Environment** on the left menu.
 - Check **Existing Enviroment** and select the correct pyenv's python installation / click ok
 - Now click again on the small gear icon, and this time click on **Pipenv Environment** on the left menu
 - The base interpreter will be available; select it! (at current time, if you don't follow what I wrote here above you won't find it)
