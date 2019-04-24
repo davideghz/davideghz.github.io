@@ -194,6 +194,18 @@ clicks on the icon. This class makes the topnav look good on small screens
     border-radius: 50px;
     margin-right: 10px;
   }
+
+  img {
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 795px) {
+  .Posts {
+    img {
+      max-width: 100%;
+    }
+  }
 }
 
 .Pagination {
