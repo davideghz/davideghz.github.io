@@ -16,6 +16,15 @@ middleman server
 middleman build
 ```
 
+## First time cloning the repo
+```
+cd build
+git remote add origin git@github.com:davideghz/davideghz.github.io.git
+git add .
+git commit m 'first commit'
+git push origin master --force
+```
+
 ## Deploy
 ```
 cd build
