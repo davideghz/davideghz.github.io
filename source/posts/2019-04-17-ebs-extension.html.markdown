@@ -1,7 +1,7 @@
 ---
 title: EBS extensions, from WTF?! to OMGILUVIT<3
 date: 2019-04-17
-tags: me, life
+tags: aws, code, config
 ---
 
 AWS ElasticBeanstalk is an awesome tool to automate deploy operations.
