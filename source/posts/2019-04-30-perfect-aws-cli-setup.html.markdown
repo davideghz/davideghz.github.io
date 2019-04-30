@@ -9,9 +9,9 @@ tags: code, python, aws, config
 
 [...] keep the installation of AWS CLI isolated from everything else.
 
-- create `/aws` directory if it does not exist.
+- create `/.aws` directory if it does not exist.
 - create `~/.aws/.python-version` and fiull it with your favorite Python version
-- cd into `/aws` and `pipenv install awscli`
+- cd into `/.aws` and `pipenv install awscli`
 
 This will create a dedicated virtual environment and install AWS CLI there so that it’s exclusively available only from that place.
 Pipenv will know which virtual environment to use in this directory thanks to the `Pipfile.lock` file.
