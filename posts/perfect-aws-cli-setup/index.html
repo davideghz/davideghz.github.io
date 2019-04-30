@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<meta content='IE=edge;chrome=1' http-equiv='X-UA-Compatible'>
+<meta content='width=device-width' initial-scale='1' name='viewport'>
+<title>
+Davide Ghezzi | The Perfect aws-cli setup
+</title>
+<link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet'>
+<link href="../../favicon.ico" rel="icon" type="image/ico" />
+<link href="../../stylesheets/custom.css" rel="stylesheet" />
+<script src="../../javascripts/custom.js"></script>
+<link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/posts/feed.xml" />
+</head>
+<body>
+<header class='NavBar' id='nav-bar'>
+<div class='NavBar__container'>
+<a href="/posts" class="left">Posts</a>
+<a href="/" class="left">About</a>
+<a href="#" onclick="myFunction()" class="icon">&#9776;</a>
+</div>
+</header>
+
+<div class='Main'>
+<div class='Page'>
+<div class='Posts'>
+<article class='Posts__post'>
+<time class='Posts__postDate'>
+2019 Apr 30
+</time>
+<header class='Posts__postTitle'>
+The Perfect aws-cli setup
+</header>
+<div class='Posts__postContent'>
+<blockquote>
+<p><strong>Shameless acknowledgment</strong>: All the following has been copied and pasted from https://duseev.com/articles/perfect-aws-cli-setup.
+I found that article so useful that I wanted to dump it here in case that blog will stop working.</p>
+</blockquote>
+
+<p>[&hellip;] keep the installation of AWS CLI isolated from everything else.</p>
+
+<ul>
+<li>create <code>/aws</code> directory if it does not exist.</li>
+<li>create <code>~/.aws/.python-version</code> and fiull it with your favorite Python version</li>
+<li>cd into <code>/aws</code> and <code>pipenv install awscli</code></li>
+</ul>
+
+<p>This will create a dedicated virtual environment and install AWS CLI there so that it’s exclusively available only from that place.
+Pipenv will know which virtual environment to use in this directory thanks to the <code>Pipfile.lock</code> file.</p>
+
+<p>[&hellip;] make a symlink that will redirect any requests to aws command into our dedicated virtual environment.</p>
+
+<ul>
+<li>create <code>~/.aws/bin/ directory</code></li>
+<li>create <code>~/.aws/bin/aws</code> file there with the following script inside</li>
+</ul>
+<div class="highlight"><pre class="highlight shell"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="rouge-code"><pre><span style="color: #999988;font-style: italic">#!/usr/bin/env bash</span>
+<span style="color: #999988;font-style: italic"># The line above ensures cross compatibility in MacOS</span>
+
+<span style="color: #999988;font-style: italic"># Set ENV variable for PyEnv to know which interpreter to use</span>
+<span style="color: #999988;font-style: italic"># This will not work if you no longer have 3.6.5 version in Pyenv!</span>
+<span style="color: #0086B3">export </span><span style="color: #008080">PYENV_VERSION</span><span style="color: #000000;font-weight: bold">=</span>3.6.5
+
+<span style="color: #999988;font-style: italic"># Set PIPENV location ENV variable to tell Pipenv where to look for virtual environment.</span>
+<span style="color: #0086B3">export </span><span style="color: #008080">PIPENV_PIPFILE</span><span style="color: #000000;font-weight: bold">=</span>~/.aws/Pipfile
+
+<span style="color: #999988;font-style: italic"># When this command is executed following happens:</span>
+<span style="color: #999988;font-style: italic"># 1. Pyenv starts and uses shims to look for the pipenv module in the</span>
+<span style="color: #999988;font-style: italic">#    3.6.5 installation of Python. Then it starts pipenv</span>
+<span style="color: #999988;font-style: italic"># 2. Pipenv reads Pipfile location from environment variable of the</span>
+<span style="color: #999988;font-style: italic">#    shell that we just set and finds the aws executable</span>
+<span style="color: #999988;font-style: italic">#    in the dedicated virtual evnironment.</span>
+<span style="color: #999988;font-style: italic"># 3. We pass all the arguments in our script to aws executable using</span>
+<span style="color: #999988;font-style: italic">#    "$@" bash directive.</span>
+pipenv run aws <span style="color: #d14">"</span><span style="color: #008080">$@</span><span style="color: #d14">"</span>
+</pre></td></tr></tbody></table></code></pre></div>
+<ul>
+<li>make the script executable: <code>chmod a+x ~/.aws/bin/aws</code></li>
+<li>create a symlink to this executable script <code>sudo ln -s ~/.aws/bin/aws /usr/local/bin</code></li>
+</ul>
+
+<p>That&rsquo;s it! The aws executable is now available from any directory.</p>
+<div class="highlight"><pre class="highlight shell"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre>~<span style="color: #008080">$ </span><span style="color: #0086B3">pwd</span>
+/Users/davide
+
+~<span style="color: #008080">$ </span>aws <span style="color: #000080">--version</span>
+aws-cli/1.16.148 Python/3.6.8 Darwin/18.5.0 botocore/1.12.138
+</pre></td></tr></tbody></table></code></pre></div>
+</div>
+</article>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
