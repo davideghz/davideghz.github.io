@@ -5,10 +5,133 @@
   <id>http://blog.url.com/posts</id>
   <link href="http://blog.url.com/posts"/>
   <link href="http://blog.url.com/feed.xml" rel="self"/>
-  <updated>2019-04-30T02:00:00+02:00</updated>
+  <updated>2019-08-22T02:00:00+02:00</updated>
   <author>
     <name>Blog Author</name>
   </author>
+  <entry>
+    <title>Deploy a Django App with Pipenv</title>
+    <link rel="alternate" href="http://blog.url.com/posts/deploy-django-with-pipenv/"/>
+    <id>http://blog.url.com/posts/deploy-django-with-pipenv/</id>
+    <published>2019-08-22T02:00:00+02:00</published>
+    <updated>2019-08-22T17:40:13+02:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Warning&lt;/strong&gt;: setup your remote environment with &lt;strong&gt;Pipenv&lt;/strong&gt;; if you don&amp;rsquo;t know how to do that, you might want to
+check my &lt;a href="https://davideghezzi.com/posts/install-python-the-right-way/"&gt;post&lt;/a&gt; about it.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Once saved in a &lt;strong&gt;deploy.sh&lt;/strong&gt; file, the deploy script is thought to be launched from your local system, from the Django
+project&amp;rsquo;s root folder, with something like &lt;code&gt;./deploy.sh /path/to/your-key.pem&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Note that, in order to ssh to the server, the script currently requires &lt;code&gt;/path/to/your-key.pem&lt;/code&gt; string as first positional parameter.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;deploy.sh&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;&lt;span style="color: #999988;font-style: italic"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span style="color: #999988;font-style: italic"&gt;# set handy variables&lt;/span&gt;
+&lt;span style="color: #008080"&gt;REMOTE&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;ubuntu@ec2-xx-xxx-xxx-x.eu-west-1.compute.amazonaws.com
+&lt;span style="color: #008080"&gt;REMOTE_FOLDER&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt;/path/to/your/django-app/
+
+&lt;span style="color: #999988;font-style: italic"&gt;# pull latest changes&lt;/span&gt;
+ssh &lt;span style="color: #000080"&gt;-i&lt;/span&gt; &lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$1&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt; &lt;span style="color: #008080"&gt;$REMOTE&lt;/span&gt; &lt;span style="color: #d14"&gt;"cd &lt;/span&gt;&lt;span style="color: #008080"&gt;$REMOTE_FOLDER&lt;/span&gt;&lt;span style="color: #d14"&gt;; git pull"&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt;
+
+&lt;span style="color: #999988;font-style: italic"&gt;# install dependencies defined in Pipenv file&lt;/span&gt;
+ssh &lt;span style="color: #000080"&gt;-i&lt;/span&gt; &lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$1&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt; &lt;span style="color: #008080"&gt;$REMOTE&lt;/span&gt; &lt;span style="color: #d14"&gt;"cd &lt;/span&gt;&lt;span style="color: #008080"&gt;$REMOTE_FOLDER&lt;/span&gt;&lt;span style="color: #d14"&gt;; export LC_ALL=C.UTF-8; export LANG=C.UTF-8; /home/ubuntu/.local/bin/pipenv install"&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt;
+
+&lt;span style="color: #999988;font-style: italic"&gt;# run scripts defined in Pipenv file (cannot call manage.py scripts directly due to wrong context and lack of real terminal issues)&lt;/span&gt;
+ssh &lt;span style="color: #000080"&gt;-i&lt;/span&gt; &lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$1&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt; &lt;span style="color: #008080"&gt;$REMOTE&lt;/span&gt; &lt;span style="color: #d14"&gt;"cd &lt;/span&gt;&lt;span style="color: #008080"&gt;$REMOTE_FOLDER&lt;/span&gt;&lt;span style="color: #d14"&gt;; export LC_ALL=C.UTF-8; export LANG=C.UTF-8; /home/ubuntu/.local/bin/pipenv run migrate"&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt;
+ssh &lt;span style="color: #000080"&gt;-i&lt;/span&gt; &lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$1&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt; &lt;span style="color: #008080"&gt;$REMOTE&lt;/span&gt; &lt;span style="color: #d14"&gt;"cd &lt;/span&gt;&lt;span style="color: #008080"&gt;$REMOTE_FOLDER&lt;/span&gt;&lt;span style="color: #d14"&gt;; export LC_ALL=C.UTF-8; export LANG=C.UTF-8; /home/ubuntu/.local/bin/pipenv run collectstatic"&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt;
+
+&lt;span style="color: #999988;font-style: italic"&gt;# restart gunicorn and nginx&lt;/span&gt;
+ssh &lt;span style="color: #000080"&gt;-i&lt;/span&gt; &lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$1&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt; &lt;span style="color: #008080"&gt;$REMOTE&lt;/span&gt; &lt;span style="color: #d14"&gt;"cd &lt;/span&gt;&lt;span style="color: #008080"&gt;$REMOTE_FOLDER&lt;/span&gt;&lt;span style="color: #d14"&gt;; sudo supervisorctl restart guni:gunicorn"&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt;
+ssh &lt;span style="color: #000080"&gt;-i&lt;/span&gt; &lt;span style="color: #d14"&gt;"&lt;/span&gt;&lt;span style="color: #008080"&gt;$1&lt;/span&gt;&lt;span style="color: #d14"&gt;"&lt;/span&gt; &lt;span style="color: #008080"&gt;$REMOTE&lt;/span&gt; &lt;span style="color: #d14"&gt;"cd &lt;/span&gt;&lt;span style="color: #008080"&gt;$REMOTE_FOLDER&lt;/span&gt;&lt;span style="color: #d14"&gt;; sudo service nginx restart"&lt;/span&gt;&lt;span style="background-color: #f8f8f8"&gt;;&lt;/span&gt;
+
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The scripts is commented and should be easy to understand.&lt;/p&gt;
+
+&lt;p&gt;In order to launch migrations and to collect static assets, it is important to call &lt;code&gt;manage.py&lt;/code&gt; scripts from within the
+virtual environment; for this reason I added a &lt;code&gt;[script]&lt;/code&gt; block to my &lt;strong&gt;Pipfile&lt;/strong&gt;, that I can run from the deploy script.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;You can then run &lt;code&gt;pipenv run &amp;lt;shortcut name&amp;gt;&lt;/code&gt; in your terminal to run the command in the context of your pipenv virtual
+environment even if you have not activated the pipenv shell first.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Also, this will avoid the dreadful error &amp;ldquo;inappropriate ioctl for device&amp;rdquo;, which typically means some code in your
+project or its dependencies has replaced one of the process streams (&lt;code&gt;sys.stdin&lt;/code&gt;, &lt;code&gt;sys.stdout&lt;/code&gt; or &lt;code&gt;sys.stderr&lt;/code&gt;)
+with an object that isn’t actually hooked up to a terminal, but which pretends that it is. For example,
+test runners or build systems often do this (&lt;a href="http://www.pyinvoke.org/faq.html#i-m-getting-ioerror-inappropriate-ioctl-for-device-when-i-run-commands"&gt;source&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Pipfile&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;&lt;table class="rouge-table"&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class="rouge-gutter gl"&gt;&lt;pre class="lineno"&gt;1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+&lt;/pre&gt;&lt;/td&gt;&lt;td class="rouge-code"&gt;&lt;pre&gt;&lt;span style="color: #000000;font-weight: bold"&gt;[[&lt;/span&gt;&lt;span style="color: #0086B3"&gt;source&lt;/span&gt;&lt;span style="color: #000000;font-weight: bold"&gt;]]&lt;/span&gt;
+name &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"pypi"&lt;/span&gt;
+url &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"https://pypi.org/simple"&lt;/span&gt;
+verify_ssl &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #0086B3"&gt;true&lt;/span&gt;
+
+&lt;span style="color: #000000;font-weight: bold"&gt;[&lt;/span&gt;scripts]
+migrate &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"python pariterequity/manage.py migrate --noinput"&lt;/span&gt;
+collectstatic &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"python pariterequity/manage.py collectstatic --noinput"&lt;/span&gt;
+
+&lt;span style="color: #000000;font-weight: bold"&gt;[&lt;/span&gt;dev-packages]
+
+&lt;span style="color: #000000;font-weight: bold"&gt;[&lt;/span&gt;packages]
+django &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"*"&lt;/span&gt;
+django-storages &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"*"&lt;/span&gt;
+boto3 &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"*"&lt;/span&gt;
+django-compressor &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"*"&lt;/span&gt;
+django-sass-processor &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"*"&lt;/span&gt;
+libsass &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"*"&lt;/span&gt;
+
+&lt;span style="color: #000000;font-weight: bold"&gt;[&lt;/span&gt;requires]
+python_version &lt;span style="color: #000000;font-weight: bold"&gt;=&lt;/span&gt; &lt;span style="color: #d14"&gt;"3.6.8"&lt;/span&gt;
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Happy deploying :)&lt;/p&gt;
+</content>
+  </entry>
   <entry>
     <title>The Perfect aws-cli setup</title>
     <link rel="alternate" href="http://blog.url.com/posts/perfect-aws-cli-setup/"/>

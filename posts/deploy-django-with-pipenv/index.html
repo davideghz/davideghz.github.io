@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<meta content='IE=edge;chrome=1' http-equiv='X-UA-Compatible'>
+<meta content='width=device-width' initial-scale='1' name='viewport'>
+<title>
+Davide Ghezzi | Deploy a Django App with Pipenv
+</title>
+<link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet'>
+<link href="../../favicon.ico" rel="icon" type="image/ico" />
+<link href="../../stylesheets/custom.css" rel="stylesheet" />
+<script src="../../javascripts/custom.js"></script>
+<link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/posts/feed.xml" />
+</head>
+<body>
+<header class='NavBar' id='nav-bar'>
+<div class='NavBar__container'>
+<a href="/posts" class="left">Posts</a>
+<a href="/" class="left">About</a>
+<a href="#" onclick="myFunction()" class="icon">&#9776;</a>
+</div>
+</header>
+
+<div class='Main'>
+<div class='Page'>
+<div class='Posts'>
+<article class='Posts__post'>
+<time class='Posts__postDate'>
+2019 Aug 22
+</time>
+<header class='Posts__postTitle'>
+Deploy a Django App with Pipenv
+</header>
+<div class='Posts__postContent'>
+<blockquote>
+<p><strong>Warning</strong>: setup your remote environment with <strong>Pipenv</strong>; if you don&rsquo;t know how to do that, you might want to
+check my <a href="https://davideghezzi.com/posts/install-python-the-right-way/">post</a> about it.</p>
+</blockquote>
+
+<p>Once saved in a <strong>deploy.sh</strong> file, the deploy script is thought to be launched from your local system, from the Django
+project&rsquo;s root folder, with something like <code>./deploy.sh /path/to/your-key.pem</code>.</p>
+
+<p>Note that, in order to ssh to the server, the script currently requires <code>/path/to/your-key.pem</code> string as first positional parameter.</p>
+
+<p><strong>deploy.sh</strong></p>
+<div class="highlight"><pre class="highlight shell"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="rouge-code"><pre><span style="color: #999988;font-style: italic">#!/bin/bash</span>
+
+<span style="color: #999988;font-style: italic"># set handy variables</span>
+<span style="color: #008080">REMOTE</span><span style="color: #000000;font-weight: bold">=</span>ubuntu@ec2-xx-xxx-xxx-x.eu-west-1.compute.amazonaws.com
+<span style="color: #008080">REMOTE_FOLDER</span><span style="color: #000000;font-weight: bold">=</span>/path/to/your/django-app/
+
+<span style="color: #999988;font-style: italic"># pull latest changes</span>
+ssh <span style="color: #000080">-i</span> <span style="color: #d14">"</span><span style="color: #008080">$1</span><span style="color: #d14">"</span> <span style="color: #008080">$REMOTE</span> <span style="color: #d14">"cd </span><span style="color: #008080">$REMOTE_FOLDER</span><span style="color: #d14">; git pull"</span><span style="background-color: #f8f8f8">;</span>
+
+<span style="color: #999988;font-style: italic"># install dependencies defined in Pipenv file</span>
+ssh <span style="color: #000080">-i</span> <span style="color: #d14">"</span><span style="color: #008080">$1</span><span style="color: #d14">"</span> <span style="color: #008080">$REMOTE</span> <span style="color: #d14">"cd </span><span style="color: #008080">$REMOTE_FOLDER</span><span style="color: #d14">; export LC_ALL=C.UTF-8; export LANG=C.UTF-8; /home/ubuntu/.local/bin/pipenv install"</span><span style="background-color: #f8f8f8">;</span>
+
+<span style="color: #999988;font-style: italic"># run scripts defined in Pipenv file (cannot call manage.py scripts directly due to wrong context and lack of real terminal issues)</span>
+ssh <span style="color: #000080">-i</span> <span style="color: #d14">"</span><span style="color: #008080">$1</span><span style="color: #d14">"</span> <span style="color: #008080">$REMOTE</span> <span style="color: #d14">"cd </span><span style="color: #008080">$REMOTE_FOLDER</span><span style="color: #d14">; export LC_ALL=C.UTF-8; export LANG=C.UTF-8; /home/ubuntu/.local/bin/pipenv run migrate"</span><span style="background-color: #f8f8f8">;</span>
+ssh <span style="color: #000080">-i</span> <span style="color: #d14">"</span><span style="color: #008080">$1</span><span style="color: #d14">"</span> <span style="color: #008080">$REMOTE</span> <span style="color: #d14">"cd </span><span style="color: #008080">$REMOTE_FOLDER</span><span style="color: #d14">; export LC_ALL=C.UTF-8; export LANG=C.UTF-8; /home/ubuntu/.local/bin/pipenv run collectstatic"</span><span style="background-color: #f8f8f8">;</span>
+
+<span style="color: #999988;font-style: italic"># restart gunicorn and nginx</span>
+ssh <span style="color: #000080">-i</span> <span style="color: #d14">"</span><span style="color: #008080">$1</span><span style="color: #d14">"</span> <span style="color: #008080">$REMOTE</span> <span style="color: #d14">"cd </span><span style="color: #008080">$REMOTE_FOLDER</span><span style="color: #d14">; sudo supervisorctl restart guni:gunicorn"</span><span style="background-color: #f8f8f8">;</span>
+ssh <span style="color: #000080">-i</span> <span style="color: #d14">"</span><span style="color: #008080">$1</span><span style="color: #d14">"</span> <span style="color: #008080">$REMOTE</span> <span style="color: #d14">"cd </span><span style="color: #008080">$REMOTE_FOLDER</span><span style="color: #d14">; sudo service nginx restart"</span><span style="background-color: #f8f8f8">;</span>
+
+</pre></td></tr></tbody></table></code></pre></div>
+<p>The scripts is commented and should be easy to understand.</p>
+
+<p>In order to launch migrations and to collect static assets, it is important to call <code>manage.py</code> scripts from within the
+virtual environment; for this reason I added a <code>[script]</code> block to my <strong>Pipfile</strong>, that I can run from the deploy script.</p>
+
+<blockquote>
+<p>You can then run <code>pipenv run &lt;shortcut name&gt;</code> in your terminal to run the command in the context of your pipenv virtual
+environment even if you have not activated the pipenv shell first.</p>
+</blockquote>
+
+<p>Also, this will avoid the dreadful error &ldquo;inappropriate ioctl for device&rdquo;, which typically means some code in your
+project or its dependencies has replaced one of the process streams (<code>sys.stdin</code>, <code>sys.stdout</code> or <code>sys.stderr</code>)
+with an object that isn’t actually hooked up to a terminal, but which pretends that it is. For example,
+test runners or build systems often do this (<a href="http://www.pyinvoke.org/faq.html#i-m-getting-ioerror-inappropriate-ioctl-for-device-when-i-run-commands">source</a>).</p>
+
+<p><strong>Pipfile</strong></p>
+<div class="highlight"><pre class="highlight shell"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td><td class="rouge-code"><pre><span style="color: #000000;font-weight: bold">[[</span><span style="color: #0086B3">source</span><span style="color: #000000;font-weight: bold">]]</span>
+name <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"pypi"</span>
+url <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"https://pypi.org/simple"</span>
+verify_ssl <span style="color: #000000;font-weight: bold">=</span> <span style="color: #0086B3">true</span>
+
+<span style="color: #000000;font-weight: bold">[</span>scripts]
+migrate <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"python pariterequity/manage.py migrate --noinput"</span>
+collectstatic <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"python pariterequity/manage.py collectstatic --noinput"</span>
+
+<span style="color: #000000;font-weight: bold">[</span>dev-packages]
+
+<span style="color: #000000;font-weight: bold">[</span>packages]
+django <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"*"</span>
+django-storages <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"*"</span>
+boto3 <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"*"</span>
+django-compressor <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"*"</span>
+django-sass-processor <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"*"</span>
+libsass <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"*"</span>
+
+<span style="color: #000000;font-weight: bold">[</span>requires]
+python_version <span style="color: #000000;font-weight: bold">=</span> <span style="color: #d14">"3.6.8"</span>
+</pre></td></tr></tbody></table></code></pre></div>
+<p>Happy deploying :)</p>
+
+</div>
+</article>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
