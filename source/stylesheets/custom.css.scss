@@ -146,6 +146,9 @@ clicks on the icon. This class makes the topnav look good on small screens
   }
   i {
     font-size: 40px;
+    &.small {
+      font-size: $base-font-size;
+    }
   }
 }
 
